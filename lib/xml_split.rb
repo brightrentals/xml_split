@@ -25,6 +25,7 @@ class XmlSplit
     @path = File.expand_path path
     @element = element
     @caching = options.fetch :caching, false
+    @exact_match = options.fetch :exact_match, false
   end
 
   def each(&blk)
@@ -37,7 +38,8 @@ class XmlSplit
         while additional = io.read(CHUNK_SIZE)
           buffer = leftover + additional
           while (start = buffer.index(MAGIC_START)) and (stop = buffer.index(MAGIC_STOP))
-            node = buffer[(start+MAGIC_START.length)...stop] + '>'
+            node = buffer[(start+MAGIC_START.length)...stop]
+            node += '>' unless @exact_match
             if caching
               @nodes << node
             end
